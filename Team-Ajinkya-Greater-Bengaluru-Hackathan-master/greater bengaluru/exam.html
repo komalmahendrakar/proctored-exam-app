@@ -1,0 +1,312 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Student Exam Portal</title>
+    <style>
+        /* Reset default styles */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f1f1f1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Exam Container */
+        .exam-container {
+            background-color: #fff;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            width: 100%;
+            max-width: 800px;
+            text-align: center;
+            border: 1px solid #ddd;
+        }
+
+        h1 {
+            color: #333;
+            margin-bottom: 20px;
+            font-size: 30px;
+        }
+
+        /* Student Info Section */
+        .student-info {
+            margin-bottom: 20px;
+            font-size: 18px;
+            color: #555;
+        }
+
+        .student-info .name {
+            font-weight: bold;
+            font-size: 22px;
+        }
+
+        /* Timer Section */
+        .timer {
+            font-size: 20px;
+            font-weight: bold;
+            color: #e74c3c;
+            margin-bottom: 30px;
+        }
+
+        /* Question Section */
+        .question {
+            font-size: 18px;
+            color: #333;
+            margin-bottom: 20px;
+        }
+
+        /* Options */
+        .options {
+            text-align: left;
+            margin: 20px 0;
+        }
+
+        .options input[type="radio"] {
+            margin-right: 10px;
+        }
+
+        .options label {
+            font-size: 16px;
+            color: #555;
+            display: block;
+            margin: 5px 0;
+        }
+
+        /* Buttons */
+        .btn-container {
+            margin-top: 20px;
+        }
+
+        .btn-container button {
+            padding: 10px 20px;
+            background-color: #3498db;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-container button:hover {
+            background-color: #2980b9;
+        }
+
+        .btn-container button:disabled {
+            background-color: #bdc3c7;
+            cursor: not-allowed;
+        }
+
+        /* Result Section */
+        .result {
+            margin-top: 30px;
+            font-size: 18px;
+            color: #2ecc71;
+        }
+
+        /* Secure Exam Warning Box */
+        #warning-box {
+            position: fixed;
+            top: 10px;
+            right: 10px;
+            background: red;
+            color: white;
+            padding: 15px;
+            font-size: 18px;
+            border-radius: 5px;
+            font-weight: bold;
+            display: none;
+        }
+
+        #warning-box button {
+            background: white;
+            color: red;
+            border: none;
+            padding: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <!-- Exam Container -->
+    <div class="exam-container">
+        <h1>Student Exam</h1>
+
+        <!-- Student Info Section -->
+        <div class="student-info">
+            <p class="name">Student: Jay</p>
+            <p>Course: Computer Science</p>
+        </div>
+
+        <!-- Timer Section -->
+        <div class="timer">
+            Time Remaining: <span id="timer">10:00</span>
+        </div>
+
+        <!-- Question Section -->
+        <div class="question">
+            <p id="question">What is the capital of France?</p>
+        </div>
+
+        <!-- Options -->
+        <div class="options">
+            <input type="radio" id="option1" name="answer" value="a">
+            <label for="option1">A. Paris</label>
+
+            <input type="radio" id="option2" name="answer" value="b">
+            <label for="option2">B. London</label>
+
+            <input type="radio" id="option3" name="answer" value="c">
+            <label for="option3">C. Berlin</label>
+
+            <input type="radio" id="option4" name="answer" value="d">
+            <label for="option4">D. Madrid</label>
+        </div>
+
+        <!-- Button Container -->
+        <div class="btn-container">
+            <button id="submitBtn" onclick="submitAnswer()">Submit Answer</button>
+        </div>
+
+        <!-- Result Section -->
+        <div class="result" id="resultSection" style="display: none;">
+            <p id="resultText"></p>
+        </div>
+    </div>
+
+    <!-- Warning Box for Secure Exam -->
+    <div id="warning-box"></div>
+
+    <script>
+        let timeRemaining = 600; // Timer in seconds (10 minutes)
+        const timerElement = document.getElementById('timer');
+        const submitBtn = document.getElementById('submitBtn');
+        const resultSection = document.getElementById('resultSection');
+        const resultText = document.getElementById('resultText');
+        const warningBox = document.getElementById('warning-box');
+        let warningCount = 0;
+
+        // Timer Function
+        function startTimer() {
+            const interval = setInterval(function() {
+                if (timeRemaining <= 0) {
+                    clearInterval(interval);
+                    submitBtn.disabled = true;
+                    resultSection.style.display = 'block';
+                    resultText.innerText = 'Time is up! You cannot submit any more answers.';
+                    return;
+                }
+
+                timeRemaining--;
+                const minutes = Math.floor(timeRemaining / 60);
+                const seconds = timeRemaining % 60;
+                timerElement.innerText = `${minutes}:${seconds < 10 ? '0' + seconds : seconds}`;
+            }, 1000);
+        }
+
+        // Submit Answer Function
+        function submitAnswer() {
+            let selectedAnswer = document.querySelector('input[name="answer"]:checked');
+            if (!selectedAnswer) {
+                alert('Please select an answer!');
+                return;
+            }
+
+            // Check Answer (for demonstration purposes, correct answer is 'A')
+            if (selectedAnswer.value === 'a') {
+                resultSection.style.display = 'block';
+                resultText.innerText = 'Correct Answer!';
+            } else {
+                resultSection.style.display = 'block';
+                resultText.innerText = 'Incorrect Answer. Try again!';
+            }
+
+            // Disable the submit button after the first submission
+            submitBtn.disabled = true;
+        }
+
+        // Warning for Secure Exam Violations
+        function updateWarning() {
+            warningBox.style.display = "block";
+            warningBox.innerHTML = `
+                <p>⚠️ Warning! You have ${warningCount} violations! Re-enter fullscreen now.</p>
+                <button onclick="enterFullScreen()">Re-Enter Fullscreen</button>
+            `;
+            if (warningCount >= 60) {
+                document.body.innerHTML = "<h1 style='color:red;'>Test Locked Due to Violations!</h1>";
+            }
+        }
+
+        function enterFullScreen() {
+            let elem = document.documentElement;
+            if (elem.requestFullscreen) {
+                elem.requestFullscreen();
+            } else if (elem.mozRequestFullScreen) {
+                elem.mozRequestFullScreen();
+            } else if (elem.webkitRequestFullscreen) {
+                elem.webkitRequestFullscreen();
+            } else if (elem.msRequestFullscreen) {
+                elem.msRequestFullscreen();
+            }
+        }
+
+        function checkFullScreen() {
+            if (!document.fullscreenElement) {
+                warningCount++;
+                updateWarning();
+            } else {
+                warningBox.style.display = "none";
+            }
+        }
+        setInterval(checkFullScreen, 500);
+
+        // Prevent cheating
+        document.addEventListener("keydown", function (event) {
+            if ((event.ctrlKey && ["c", "v", "x", "a", "w"].includes(event.key)) || 
+                (event.altKey && event.key === "Tab") || 
+                (event.key === "F11") || 
+                (event.key === "Escape") ||
+                (event.altKey && event.key === "f4") ||
+                (event.ctrlKey && event.shiftKey && event.key === "s") || 
+                (event.metaKey && event.shiftKey && event.key === "s") || 
+                (event.key === "PrintScreen") ||
+                (event.ctrlKey && event.key === "Tab") || 
+                (event.ctrlKey && event.shiftKey && event.key === "Tab") || 
+                (event.ctrlKey && /^[1-9]$/.test(event.key)) ||
+                (event.ctrlKey && event.shiftKey && event.key === "T")) {
+                event.preventDefault();
+                warningCount++;
+                updateWarning();
+            }
+        });
+
+        // Fullscreen check on visibility change
+        document.addEventListener("visibilitychange", function() {
+            if (document.hidden) {
+                warningCount++;
+                updateWarning();
+            }
+        });
+
+        window.addEventListener("blur", function () {
+            warningCount++;
+            updateWarning();
+        });
+
+        window.onload = startTimer;
+    </script>
+</body>
+</html>

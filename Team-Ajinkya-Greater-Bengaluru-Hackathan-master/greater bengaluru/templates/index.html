@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Activity Risk Monitor</title>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+        body {
+            background-color: #f8f9fa;
+            text-align: center;
+            padding-top: 50px;
+        }
+        .card {
+            max-width: 500px;
+            margin: auto;
+            border-radius: 15px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        }
+        .risk-score {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        .btn-custom {
+            margin-top: 10px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="card p-4">
+            <h2>User Activity Risk Monitor</h2>
+            <p class="lead">Live risk analysis based on keyboard & mouse activity</p>
+            <hr>
+            <h4>Risk Level:</h4>
+            <p id="risk_level" class="risk-score text-danger">Loading...</p>
+            <h4>Risk Score:</h4>
+            <p id="risk_score" class="risk-score">0</p>
+            <h4>Risk Percentage:</h4>
+            <p id="risk_percentage" class="risk-score">0%</p>
+            <button id="start_exam" class="btn btn-primary btn-custom">Start Exam</button>
+            <button id="start_question" class="btn btn-secondary btn-custom">Next Question</button>
+            <button id="submit_question" class="btn btn-success btn-custom">Submit Question</button>
+        </div>
+    </div>
+
+    <script>
+        function updateRisk() {
+            $.getJSON('/risk', function(data) {
+                $("#risk_level").text(data.risk_level);
+                $("#risk_score").text(data.score);
+                $("#risk_percentage").text(data.risk_percentage.toFixed(2) + "%");
+            });
+        }
+        setInterval(updateRisk, 5000);
+        updateRisk();
+
+        $("#start_exam").click(function() {
+            $.post("/start_exam", function(response) {
+                alert(response.message);
+            });
+        });
+
+        $("#start_question").click(function() {
+            const questionData = {
+                question_type: "mcq", 
+                question_id: "Q1"
+            };
+            $.ajax({
+                url: "/start_question",
+                type: "POST",
+                contentType: "application/json",
+                data: JSON.stringify(questionData),
+                success: function(response) {
+                    alert(response.message + " (Attempt: " + response.attempt_count + ")");
+                },
+                error: function(xhr) {
+                    alert("Error: " + xhr.responseJSON.error);
+                }
+            });
+        });
+
+        $("#submit_question").click(function() {
+            $.post("/submit_question", function(response) {
+                alert("Question Submitted! Risk Score: " + response.risk_score);
+            }).fail(function(xhr) {
+                alert("Error: " + xhr.responseJSON.error);
+            });
+        });
+    </script>
+</body>
+</html>
