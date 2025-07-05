@@ -1,10 +1,10 @@
-# 🚀 Bangalore Biz Bridge
+#  Bangalore Biz Bridge!!
 
 **Bangalore Biz Bridge** is a web-based platform designed to connect **entrepreneurs** with **investors**. Entrepreneurs can submit their business ideas, and investors can explore these and get in touch if interested.
 
 ---
 
-## 🔑 Features
+##  Features
 
 - 👥 Dual login: Investor & Entrepreneur
 - 💡 Entrepreneurs can submit startup ideas
